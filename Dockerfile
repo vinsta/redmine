@@ -6,7 +6,7 @@ RUN set -ex \
     && export BUNDLE_SILENCE_ROOT_WARNING=1 \
     && cd / \
     && apk --update add --virtual .redmine-deps \
-         ruby ruby-bundler ruby-bigdecimal ruby-json sqlite-libs tzdata git svn mercurial\
+         ruby ruby-bundler ruby-bigdecimal ruby-json sqlite-libs tzdata git subversion mercurial\
     && apk add --virtual .redmine-builddpes \
          curl build-base ruby-dev sqlite-dev zlib-dev \
     && export REDMINE_TAR=https://github.com/redmine/redmine/archive/master.tar.gz \
