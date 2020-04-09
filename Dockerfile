@@ -8,10 +8,10 @@ RUN apt-get update \
     && echo "mysql-server-5.7 mysql-server/root_password password redmine" | debconf-set-selections \
     && echo "mysql-server-5.7 mysql-server/root_password_again password redmine" | debconf-set-selections \
     && apt-get install -y sudo tzdata build-essential zlib1g-dev libssl-dev libreadline-dev libyaml-dev \
-        libcurl4-openssl-dev mysql-server-5.7 libmysqlclient-dev libapr1-dev libaprutil1-dev apache2-utils \
-        apache2-dev imagemagick libmagick++-dev fonts-takao-pgothic subversion libapache2-svn git gitweb \
-        libssh2-1 libssh2-1-dev cmake libgpg-error-dev ruby2.5 ruby2.5-dev zlib1g-dev libdigest-sha-perl \
-        libapache-dbi-perl libdbd-mysql-perl libauthen-simple-ldap-perl \
+    && apt-get install -y libcurl4-openssl-dev mysql-server-5.7 libmysqlclient-dev libapr1-dev libaprutil1-dev apache2-utils \
+    && apt-get install -y apache2-dev imagemagick libmagick++-dev fonts-takao-pgothic subversion libapache2-svn git gitweb \
+    && apt-get install -y libssh2-1 libssh2-1-dev cmake libgpg-error-dev ruby2.5 ruby2.5-dev zlib1g-dev libdigest-sha-perl \
+    && apt-get install -y libapache-dbi-perl libdbd-mysql-perl libauthen-simple-ldap-perl \
     && gem install bundler \
     && gem install passenger --no-rdoc --no-ri \
     && passenger-install-apache2-module --auto
