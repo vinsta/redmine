@@ -65,7 +65,7 @@ ADD scm-post-create.sh /redmine/
 
 COPY entrypoint.sh /redmine/
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/redmine/entrypoint.sh"]
 
 EXPOSE 3000
 
