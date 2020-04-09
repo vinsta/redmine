@@ -61,7 +61,7 @@ WORKDIR /redmine
 
 VOLUME ["/redmine/files"]
 
-ADD scm-post-create.sh /var/lib/redmine/
+ADD scm-post-create.sh /redmine/
 
 COPY entrypoint.sh /usr/local/bin/
 
