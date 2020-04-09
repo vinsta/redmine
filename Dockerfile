@@ -1,20 +1,20 @@
-FROM library/ubuntu:20.04
+FROM ubuntu:20.04
 MAINTAINER luckyv
 
 RUN apt-get update \
-	&& apt-get install -y software-properties-common \
-	&& apt-add-repository ppa:brightbox/ruby-ng \
-	&& apt-get update \
-	&& echo "mysql-server-5.7 mysql-server/root_password password redmine" | debconf-set-selections \
-	&& echo "mysql-server-5.7 mysql-server/root_password_again password redmine" | debconf-set-selections \
-	&& apt-get install -y sudo tzdata build-essential zlib1g-dev libssl-dev libreadline-dev libyaml-dev \
-		libcurl4-openssl-dev mysql-server-5.7 libmysqlclient-dev libapr1-dev libaprutil1-dev apache2-utils \
-		apache2-dev imagemagick libmagick++-dev fonts-takao-pgothic subversion libapache2-svn git gitweb \
+    && apt-get install -y software-properties-common 
+RUN apt-add-repository ppa:brightbox/ruby-ng \
+    && apt-get update 
+RUN echo "mysql-server-5.7 mysql-server/root_password password redmine" | debconf-set-selections \
+    && echo "mysql-server-5.7 mysql-server/root_password_again password redmine" | debconf-set-selections \
+    && apt-get install -y sudo tzdata build-essential zlib1g-dev libssl-dev libreadline-dev libyaml-dev \
+        libcurl4-openssl-dev mysql-server-5.7 libmysqlclient-dev libapr1-dev libaprutil1-dev apache2-utils \
+        apache2-dev imagemagick libmagick++-dev fonts-takao-pgothic subversion libapache2-svn git gitweb \
         libssh2-1 libssh2-1-dev cmake libgpg-error-dev ruby2.5 ruby2.5-dev zlib1g-dev libdigest-sha-perl \
         libapache-dbi-perl libdbd-mysql-perl libauthen-simple-ldap-perl \
-	&& gem install bundler \
-	&& gem install passenger --no-rdoc --no-ri \
-	&& passenger-install-apache2-module --auto
+    && gem install bundler \
+    && gem install passenger --no-rdoc --no-ri \
+    && passenger-install-apache2-module --auto
 
 # Redmine
 RUN svn co http://svn.redmine.org/redmine/branches/4.1-stable/ /var/lib/redmine
