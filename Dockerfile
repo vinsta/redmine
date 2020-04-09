@@ -3,8 +3,8 @@ MAINTAINER luckyv
 
 RUN apt-get update \
     && apt-get install -y software-properties-common \
-    # && apt-add-repository ppa:brightbox/ruby-ng \
-    # && apt-get update 
+    && apt-add-repository -y ppa:brightbox/ruby-ng \
+    && apt-get update \
     && echo "mysql-server-5.7 mysql-server/root_password password redmine" | debconf-set-selections \
     && echo "mysql-server-5.7 mysql-server/root_password_again password redmine" | debconf-set-selections \
     && apt-get install -y sudo tzdata build-essential zlib1g-dev libssl-dev libreadline-dev libyaml-dev \
