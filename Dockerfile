@@ -6,7 +6,7 @@ RUN set -ex \
     && export BUNDLE_SILENCE_ROOT_WARNING=1 \
     && cd / \
     && apk --update add --virtual .redmine-deps \
-         ruby ruby-bundler ruby-bigdecimal ruby-json sqlite-libs tzdata git mercurial\
+         ruby ruby-bundler ruby-bigdecimal ruby-json sqlite-libs tzdata git svn mercurial\
     && apk add --virtual .redmine-builddpes \
          curl build-base ruby-dev sqlite-dev zlib-dev \
     && export REDMINE_TAR=https://github.com/redmine/redmine/archive/master.tar.gz \
@@ -65,7 +65,7 @@ ADD scm-post-create.sh /var/lib/redmine/
 
 COPY entrypoint.sh /usr/local/bin/
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 EXPOSE 3000
 
