@@ -63,9 +63,9 @@ VOLUME ["/redmine/files"]
 
 ADD scm-post-create.sh /redmine/
 
-COPY entrypoint.sh /usr/local/bin/
+COPY entrypoint.sh /redmine/
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
 
 EXPOSE 3000
 
