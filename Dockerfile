@@ -33,7 +33,7 @@ RUN set -ex \
     && cd /redmine \
         # redmine backlogs
         && git clone -b feature/redmine3 https://github.com/backlogs/redmine_backlogs.git /redmine/plugins/redmine_backlogs \
-        && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.7.2"/g' /redmine/plugins/redmine_backlogs/Gemfile \
+        && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /redmine/plugins/redmine_backlogs/Gemfile \
         && sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", ">= 0"/g' /redmine/plugins/redmine_backlogs/Gemfile \
         # scm creator
         && svn co http://svn.s-andy.com/scm-creator /redmine/plugins/redmine_scm \
