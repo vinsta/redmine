@@ -21,23 +21,6 @@ RUN set -ex \
         && echo "  database: files/redmine.sqlite3" >> config/database.yml \
         && echo "gem 'puma'" >> Gemfile.local \
         && echo 'config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))' > config/additional_environment.rb \
-        # redmine backlogs
-        && git clone -b feature/redmine3 https://github.com/backlogs/redmine_backlogs.git /redmine/plugins/redmine_backlogs \
-        && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /redmine/plugins/redmine_backlogs/Gemfile \
-        && sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", "~> 3.31.0"/g' /redmine/plugins/redmine_backlogs/Gemfile \
-        # scm creator
-        && svn co http://svn.s-andy.com/scm-creator /redmine/plugins/redmine_scm \
-        # issue template
-        && hg clone https://bitbucket.org/akiko_pusu/redmine_issue_templates /redmine/plugins/redmine_issue_templates \
-        # code review
-        && hg clone https://bitbucket.org/haru_iida/redmine_code_review /redmine/plugins/redmine_code_review \
-        # clipboard_image_paste
-        && git clone https://github.com/peclik/clipboard_image_paste.git /redmine/plugins/clipboard_image_paste \
-        # excel export
-        && git clone https://github.com/two-pack/redmine_xls_export.git /redmine/plugins/redmine_xls_export \
-        && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", ">= 1.6.7.2"/g' /redmine/plugins/redmine_xls_export/Gemfile \
-        # drafts
-        && git clone https://github.com/jbbarth/redmine_drafts.git redmine/plugins/redmine_drafts \
         && bundle install --without development test rmagick \
         && cd public/themes/ \
             && curl -sSL $MINIMALFLAT2 -o minimalflat2.zip \
@@ -60,14 +43,11 @@ WORKDIR /redmine
 
 VOLUME ["/redmine/files"]
 
-ADD scm-post-create.sh /redmine/
-
 COPY entrypoint.sh /redmine/
 
 ENTRYPOINT ["/redmine/entrypoint.sh"]
 
-RUN chmod 777 /redmine/scm-post-create.sh \
-    && chmod 777 /redmine/entrypoint.sh
+RUN chmod 777 /redmine/entrypoint.sh
 
 EXPOSE 3000
 
