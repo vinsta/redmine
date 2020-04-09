@@ -21,16 +21,6 @@ RUN set -ex \
         && echo "  database: files/redmine.sqlite3" >> config/database.yml \
         && echo "gem 'puma'" >> Gemfile.local \
         && echo 'config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))' > config/additional_environment.rb \
-        && bundle install --without development test rmagick \
-        && cd public/themes/ \
-            && curl -sSL $MINIMALFLAT2 -o minimalflat2.zip \
-            && unzip minimalflat2.zip \
-            && rm minimalflat2.zip \
-            && curl -sSL $PURPLEMINE2 | \
-               tar xz PurpleMine2-master/fonts PurpleMine2-master/images/ PurpleMine2-master/javascripts/ \
-                      PurpleMine2-master/plugins PurpleMine2-master/stylesheets \
-            && mv PurpleMine2-master purplemine2 \
-    && cd /redmine \
         # redmine backlogs
         && git clone -b feature/redmine3 https://github.com/backlogs/redmine_backlogs.git /redmine/plugins/redmine_backlogs \
         && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /redmine/plugins/redmine_backlogs/Gemfile \
@@ -48,6 +38,15 @@ RUN set -ex \
         && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", ">= 1.6.7.2"/g' /redmine/plugins/redmine_xls_export/Gemfile \
         # drafts
         && git clone https://github.com/jbbarth/redmine_drafts.git redmine/plugins/redmine_drafts \
+        && bundle install --without development test rmagick \
+        && cd public/themes/ \
+            && curl -sSL $MINIMALFLAT2 -o minimalflat2.zip \
+            && unzip minimalflat2.zip \
+            && rm minimalflat2.zip \
+            && curl -sSL $PURPLEMINE2 | \
+               tar xz PurpleMine2-master/fonts PurpleMine2-master/images/ PurpleMine2-master/javascripts/ \
+                      PurpleMine2-master/plugins PurpleMine2-master/stylesheets \
+            && mv PurpleMine2-master purplemine2 \
     && rm -rf ~/.bundle/ \
     && rm -rf /usr/lib/ruby/gems/*/cache/* \
     && apk --purge del .redmine-builddpes \
@@ -66,6 +65,9 @@ ADD scm-post-create.sh /redmine/
 COPY entrypoint.sh /redmine/
 
 ENTRYPOINT ["/redmine/entrypoint.sh"]
+
+RUN chmod 777 /redmine/scm-post-create.sh \
+    && chmod 777 /redmine/entrypoint.sh
 
 EXPOSE 3000
 
