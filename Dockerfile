@@ -57,7 +57,7 @@ RUN passenger-install-apache2-module --auto
 # bundle and rake
 RUN gem install bundler
 RUN bundle install --without development test --path vendor/bundle
-RUN bundle exec gem install mysql
+# RUN bundle exec gem install mysql
 RUN chown -R www-data:www-data /var/lib/redmine/
 ADD redmine/Makefile /var/lib/redmine/
 RUN make rake
