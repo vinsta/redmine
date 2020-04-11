@@ -25,10 +25,11 @@ WORKDIR /var/lib/redmine
 
 # redmine backlogs
 RUN git clone https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs
-# RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.7.2"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-# RUN sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", ">= 0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e '/gem "nokogiri".*/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e '/gem "capybara", "~> 1"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.7.2"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+RUN sed -i -e 's/gem "capybara", "~>.*[0-9]"/gem "capybara", ">= 0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+# RUN sed -i -e 's/gem "capybara", "~>1"/gem "capybara", ">= 0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+# RUN sed -i -e '/gem "nokogiri".*/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+# RUN sed -i -e '/gem "capybara", "~>"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 
 # scm creator
 RUN svn co http://svn.s-andy.com/scm-creator /var/lib/redmine/plugins/redmine_scm
