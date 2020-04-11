@@ -15,7 +15,7 @@ RUN apt-get install -y \
 	imagemagick libmagick++-dev fonts-takao-pgothic \
 	subversion libapache2-svn \
 	git gitweb libssh2-1 libssh2-1-dev cmake libgpg-error-dev \
-	ruby2.3 ruby2.3-dev zlib1g-dev \
+	ruby2.6 ruby2.6-dev zlib1g-dev \
 	libdigest-sha-perl libapache-dbi-perl libdbd-mysql-perl libauthen-simple-ldap-perl
 
 # Redmine
@@ -24,7 +24,7 @@ ADD config/* /var/lib/redmine/config/
 WORKDIR /var/lib/redmine
 
 # redmine backlogs
-RUN git clone -b feature/redmine3 https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs
+RUN git clone https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs
 # RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.7.2"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 # RUN sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", ">= 0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 RUN sed -i -e '/gem "nokogiri".*/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
@@ -51,13 +51,13 @@ RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", ">= 1.6.7.2"/g' /var/lib/redmi
 # drafts
 RUN git clone https://github.com/jbbarth/redmine_drafts.git /var/lib/redmine/plugins/redmine_drafts
 
+RUN gem install bundler
 RUN gem install passenger --no-rdoc --no-ri
 RUN passenger-install-apache2-module --auto
 
 # bundle and rake
-RUN gem install bundler
 RUN bundle install --without development test --path vendor/bundle
-# RUN bundle exec gem install mysql
+RUN bundle exec gem install mysql
 RUN chown -R www-data:www-data /var/lib/redmine/
 ADD redmine/Makefile /var/lib/redmine/
 RUN make rake
