@@ -52,7 +52,7 @@ RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", ">= 1.6.7.2"/g' /var/lib/redmi
 RUN git clone https://github.com/jbbarth/redmine_drafts.git /var/lib/redmine/plugins/redmine_drafts
 
 RUN gem install bundler
-RUN gem install passenger --no-rdoc --no-ri
+RUN gem install passenger --no-ri
 RUN passenger-install-apache2-module --auto
 
 # bundle and rake
