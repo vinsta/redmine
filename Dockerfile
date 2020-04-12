@@ -32,8 +32,8 @@ RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /var/lib/redmin
 RUN sed -i -e 's/gem "capybara", "~>.*[0-9]"/gem "capybara", "~> 3.25.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 RUN sed -i -e 's/gem "poltergeist", "~>.*[0-9]"/gem "poltergeist", "~> 1.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 RUN sed -i -e 's/gem "simplecov", "~>.*[0-9]"/gem "simplecov", "~> 0.17.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e 's/gem "cucumber", "~>.*[0-9]"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e 's/gem "cucumber-rails2", "~>.*[0-9]"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+# RUN sed -i -e 's/gem "cucumber", "~>.*[0-9]"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+# RUN sed -i -e 's/gem "cucumber-rails2", "~>.*[0-9]"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 # RUN sed -i -e 's/gem "capybara", "~>1"/gem "capybara", ">= 0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 # RUN sed -i -e '/gem "nokogiri".*/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 # RUN sed -i -e '/gem "capybara", "~>"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
