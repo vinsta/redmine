@@ -18,6 +18,10 @@ RUN apt-get install -y \
 	ruby2.3 ruby2.3-dev zlib1g-dev \
 	libdigest-sha-perl libapache-dbi-perl libdbd-mysql-perl libauthen-simple-ldap-perl
 
+RUN gem install bundler
+RUN gem install passenger
+RUN passenger-install-apache2-module --auto
+
 # Redmine
 RUN svn co http://svn.redmine.org/redmine/branches/3.3-stable/ /var/lib/redmine
 ADD config/* /var/lib/redmine/config/
@@ -26,15 +30,12 @@ WORKDIR /var/lib/redmine
 # redmine backlogs
 RUN git clone https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs
 RUN sed -i -e 's/rails3 = Gem.*/rails3 = Gem::Dependency\.new("rails", ">=3.0")/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e 's/gem "capybara", "~>.*[0-9]"/gem "capybara", "~> 3.25.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e 's/gem "poltergeist", "~>.*[0-9]"/gem "poltergeist", "~> 1.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e 's/gem "simplecov", "~>.*[0-9]"/gem "simplecov", "~> 0.17.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.7.2"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+RUN sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", ">= 0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+# RUN sed -i -e 's/gem "poltergeist", "~>.*[0-9]"/gem "poltergeist", "~> 1.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+# RUN sed -i -e 's/gem "simplecov", "~>.*[0-9]"/gem "simplecov", "~> 0.17.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 # RUN sed -i -e 's/gem "cucumber", "~>.*[0-9]"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 # RUN sed -i -e 's/gem "cucumber-rails2", "~>.*[0-9]"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-# RUN sed -i -e 's/gem "capybara", "~>1"/gem "capybara", ">= 0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-# RUN sed -i -e '/gem "nokogiri".*/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-# RUN sed -i -e '/gem "capybara", "~>"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 
 # scm creator
 RUN svn co http://svn.s-andy.com/scm-creator /var/lib/redmine/plugins/redmine_scm
@@ -56,10 +57,6 @@ RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", ">= 1.6.7.2"/g' /var/lib/redmi
 
 # drafts
 RUN git clone https://github.com/jbbarth/redmine_drafts.git /var/lib/redmine/plugins/redmine_drafts
-
-RUN gem install bundler
-RUN gem install passenger
-RUN passenger-install-apache2-module --auto
 
 # bundle and rake
 RUN bundle install --without development test --path vendor/bundle
