@@ -25,9 +25,7 @@ WORKDIR /var/lib/redmine
 
 # redmine backlogs
 RUN git clone https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs
-RUN sed -i -e 's/rails3 = Gem.*/rails4 = Gem::Dependency\.new("rails", "~> 4.0")/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e 's/RAILS_VERSION_IS_3 = rails3/RAILS_VERSION_IS_4 = rails4/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e 's/RAILS_VERSION_IS_3/RAILS_VERSION_IS_4/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+RUN sed -i -e 's/rails3 = Gem.*/rails4 = Gem::Dependency\.new("rails", ">=3.0")/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 RUN sed -i -e 's/gem "capybara", "~>.*[0-9]"/gem "capybara", "~> 3.25.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
 RUN sed -i -e 's/gem "poltergeist", "~>.*[0-9]"/gem "poltergeist", "~> 1.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
