@@ -15,7 +15,7 @@ RUN apt-get install -y \
 	imagemagick libmagick++-dev fonts-takao-pgothic \
 	subversion libapache2-svn \
 	git gitweb libssh2-1 libssh2-1-dev cmake libgpg-error-dev \
-	ruby2.5 ruby2.5-dev zlib1g-dev \
+	ruby2.3 ruby2.3-dev zlib1g-dev \
 	libdigest-sha-perl libapache-dbi-perl libdbd-mysql-perl libauthen-simple-ldap-perl
 
 # Redmine
