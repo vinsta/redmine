@@ -19,7 +19,7 @@ RUN apt-get install -y \
 	libdigest-sha-perl libapache-dbi-perl libdbd-mysql-perl libauthen-simple-ldap-perl
 
 # Redmine
-RUN svn co http://svn.redmine.org/redmine/branches/4.1-stable/ /var/lib/redmine
+RUN svn co http://svn.redmine.org/redmine/branches/3.3-stable/ /var/lib/redmine
 ADD config/* /var/lib/redmine/config/
 WORKDIR /var/lib/redmine
 
