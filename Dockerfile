@@ -34,7 +34,7 @@ RUN set -ex \
         && bundle install --without development test \
         && bundle exec rake generate_secret_token \
         && RAILS_ENV=production bundle exec rake db:migrate \
-        && RAILS_ENV=production REDMINE_LANG=zh bundle exec rake redmine:load_default_data 
+        && RAILS_ENV=production REDMINE_LANG=zh bundle exec rake redmine:load_default_data \
     && mysqladmin shutdown \
     && rm -rf ~/.bundle/ \
     && rm -rf /usr/lib/ruby/gems/*/cache/* \
