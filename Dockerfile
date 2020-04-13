@@ -16,7 +16,7 @@ RUN set -ex \
     && mysql_install_db --user=root \
     && /usr/bin/mysqld_safe & \
     && mysqladmin -u root password redmine \
-    && mysql -u root -predmine -e "CREATE DATABASE redmine CHARACTER SET utf8mb4; \
+    && mysql -u root -predmine -e "CREATE DATABASE redmine CHARACTER SET utf8mb4"; \
     && cd /var/lib \
     && curl -sSL https://github.com/redmine/redmine/archive/master.tar.gz | tar xz \
     && mv redmine-* redmine \
