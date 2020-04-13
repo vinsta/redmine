@@ -1,87 +1,63 @@
-FROM library/ubuntu:16.04
+FROM alpine
 MAINTAINER luckyv
 
-RUN apt-get update
-RUN apt-get install -y software-properties-common
-RUN apt-add-repository ppa:brightbox/ruby-ng
-RUN apt-get update
-RUN echo "mysql-server-5.7 mysql-server/root_password password redmine" | debconf-set-selections
-RUN echo "mysql-server-5.7 mysql-server/root_password_again password redmine" | debconf-set-selections
-RUN apt-get install -y \
-	sudo tzdata \
-	build-essential zlib1g-dev libssl-dev libreadline-dev libyaml-dev libcurl4-openssl-dev \
-	mysql-server-5.7 libmysqlclient-dev \
-	libapr1-dev libaprutil1-dev apache2-utils apache2-dev  \
-	imagemagick libmagick++-dev fonts-takao-pgothic \
-	subversion libapache2-svn \
-	git gitweb libssh2-1 libssh2-1-dev cmake libgpg-error-dev \
-	ruby2.3 ruby2.3-dev zlib1g-dev \
-	libdigest-sha-perl libapache-dbi-perl libdbd-mysql-perl libauthen-simple-ldap-perl
+ENV RAILS_ENV=production
+RUN set -ex \
+    && export BUNDLE_SILENCE_ROOT_WARNING=1 \
+    && apk --update add --virtual .redmine-deps \
+         ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client \
+    && apk add --virtual .redmine-builddpes \
+         curl build-base ruby-dev zlib-dev mysql-dev \
+    && mkdir -p /run/mysqld \
+    && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
+    && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
+    && sed -i '/\[mysqld\]/a\datadir = \/var\/lib\/mysql' /etc/my.cnf \
+    && sed -i '/\[mysqld\]/a\user = root' /etc/my.cnf \
+    && mysql_install_db --user=root \
+    && /usr/bin/mysqld_safe & \
+    && mysqladmin -u root password redmine \
+    && mysql -u root -predmine -e "CREATE DATABASE redmine CHARACTER SET utf8mb4; \
+    && cd /var/lib \
+    && curl -sSL https://github.com/redmine/redmine/archive/master.tar.gz | tar xz \
+    && mv redmine-* redmine \
+    && cd redmine \
+        && rm files/delete.me log/delete.me \
+        && echo "$RAILS_ENV:" > config/database.yml \
+        && echo "  adapter: mysql2" >> config/database.yml \
+        && echo "  database: redmine" >> config/database.yml \
+        && echo "  host: localhost" >> config/database.yml \
+        && echo "  username: root" >> config/database.yml \
+        && echo "  password: redmine" >> config/database.yml \
+        && echo "gem 'puma'" >> Gemfile.local \
+        # && echo 'config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))' > config/additional_environment.rb \
+        && gem install bundle \
+        && bundle install --without development test \
+        && bundle exec rake generate_secret_token \
+        && RAILS_ENV=production bundle exec rake db:migrate \
+        && RAILS_ENV=production REDMINE_LANG=zh bundle exec rake redmine:load_default_data 
+    && mysqladmin shutdown \
+    && rm -rf ~/.bundle/ \
+    && rm -rf /usr/lib/ruby/gems/*/cache/* \
+    && apk --purge del .redmine-builddpes \
+    && rm -rf /var/cache/apk/* \
+    && adduser -h /redmine -s /sbin/nologin -D -H redmine \
+    && chown -R redmine:redmine /var/lib/redmine
 
-RUN gem install bundler
-RUN gem install passenger
-RUN passenger-install-apache2-module --auto
+USER redmine:redmine
 
-# Redmine
-RUN svn co http://svn.redmine.org/redmine/branches/3.3-stable/ /var/lib/redmine
-ADD config/* /var/lib/redmine/config/
 WORKDIR /var/lib/redmine
 
-# redmine backlogs
-RUN git clone https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs
-RUN sed -i -e 's/rails3 = Gem.*/rails3 = Gem::Dependency\.new("rails", ">=3.0")/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.7.2"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", ">= 0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-# RUN sed -i -e 's/gem "poltergeist", "~>.*[0-9]"/gem "poltergeist", "~> 1.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-RUN sed -i -e 's/gem "simplecov", "~>.*[0-9]"/gem "simplecov", "~> 0.9.1"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-# RUN sed -i -e 's/gem "cucumber", "~>.*[0-9]"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-# RUN sed -i -e 's/gem "cucumber-rails2", "~>.*[0-9]"/d' /var/lib/redmine/plugins/redmine_backlogs/Gemfile
+VOLUME ["/var/lib/redmine/files"]
 
-# scm creator
-RUN svn co http://svn.s-andy.com/scm-creator /var/lib/redmine/plugins/redmine_scm
-ADD scm-post-create.sh /var/lib/redmine/
+RUN echo "#!/bin/sh" > /usr/local/bin/entrypoint.sh \
+    && echo "/usr/bin/mysqld_safe &" >> /usr/local/bin/entrypoint.sh \
+    && echo "exec '$@'" >> /usr/local/bin/entrypoint.sh \
+    && chmod +x /usr/local/bin/entrypoint.sh
 
-# issue template
-RUN apt-get install -y mercurial
-RUN hg clone https://bitbucket.org/akiko_pusu/redmine_issue_templates /var/lib/redmine/plugins/redmine_issue_templates
+# COPY entrypoint.sh /usr/local/bin/
 
-# code review
-RUN hg clone https://bitbucket.org/haru_iida/redmine_code_review /var/lib/redmine/plugins/redmine_code_review
+ENTRYPOINT ["entrypoint.sh"]
 
-# clipboard_image_paste
-RUN git clone https://github.com/peclik/clipboard_image_paste.git /var/lib/redmine/plugins/clipboard_image_paste
+EXPOSE 3000
 
-# excel export
-RUN git clone https://github.com/two-pack/redmine_xls_export.git /var/lib/redmine/plugins/redmine_xls_export
-RUN sed -i -e 's/gem "nokogiri".*/gem "nokogiri", ">= 1.6.7.2"/g' /var/lib/redmine/plugins/redmine_xls_export/Gemfile
-
-# drafts
-RUN git clone https://github.com/jbbarth/redmine_drafts.git /var/lib/redmine/plugins/redmine_drafts
-
-# bundle and rake
-RUN bundle install --without development test --path vendor/bundle
-RUN bundle exec gem install mysql
-RUN chown -R www-data:www-data /var/lib/redmine/
-ADD redmine/Makefile /var/lib/redmine/
-RUN make rake
-
-# apache2
-ADD apache2/conf-available/redmine.conf /etc/apache2/conf-available/
-ADD apache2/mods-available/dav_svn.conf /etc/apache2/mods-available/
-ADD apache2/sites-available/000-default.conf /etc/apache2/sites-available/
-# use Redmine Auth
-RUN mkdir -p /etc/perl/Apache/Authn
-RUN cp /var/lib/redmine/extra/svn/Redmine.pm /etc/perl/Apache/Authn/Redmine.pm
-
-RUN passenger-install-apache2-module --snippet >> /etc/apache2/conf-available/redmine.conf
-RUN a2enconf redmine
-RUN a2enmod cgi alias env
-
-# repository
-RUN mkdir /var/lib/svn/
-RUN chown -R www-data:www-data /var/lib/svn/ /var/lib/git/
-
-# ginalize
-EXPOSE 80
-ADD entrypoint.sh /root/
-ENTRYPOINT sh /root/entrypoint.sh
+CMD ["rails", "server", "-b", "0.0.0.0"]
