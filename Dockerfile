@@ -13,9 +13,11 @@ RUN set -ex \
     && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\datadir = \/var\/lib\/mysql' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\user = root' /etc/my.cnf \
-    && mysql_install_db --user=root \
-    && /usr/bin/mysqld_safe & \
-    && mysqladmin -u root password redmine \
+    && mysql_install_db --user=root 
+
+RUN  /usr/bin/mysqld_safe &
+
+RUN  mysqladmin -u root password redmine \
     && mysql -u root -predmine -e "CREATE DATABASE redmine CHARACTER SET utf8mb4"; \
     && cd /var/lib \
     && curl -sSL https://github.com/redmine/redmine/archive/master.tar.gz | tar xz \
