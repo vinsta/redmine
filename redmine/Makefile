@@ -1,6 +1,8 @@
 rake:
 	/usr/bin/mysqld_safe &
 
+	sleep 10
+	
 	mysqladmin -u root password redmine
 
 	# create database
@@ -19,4 +21,4 @@ rake:
 
 	RAILS_ENV=production REDMINE_LANG=zh bundle exec rake redmine:load_default_data
 
-	mysqladmin shutdownp
+	mysqladmin shutdown

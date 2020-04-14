@@ -7,7 +7,7 @@ RUN set -ex \
     && apk --update add --virtual .redmine-deps \
          ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client \
     && apk add --virtual .redmine-builddpes \
-         curl build-base ruby-dev zlib-dev mysql-dev \
+         subversion build-base ruby-dev zlib-dev mysql-dev \
     && mkdir -p /run/mysqld \
     && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
@@ -16,8 +16,7 @@ RUN set -ex \
     && mysql_install_db --user=root 
 
 RUN cd /var/lib \
-    && curl -sSL https://github.com/redmine/redmine/archive/master.tar.gz | tar xz \
-    && mv redmine-* redmine \
+    && svn co http://svn.redmine.org/redmine/branches/4.1-stable/ /var/lib/redmine \
     && cd redmine \
         && rm files/delete.me log/delete.me \
         && echo "$RAILS_ENV:" > config/database.yml \
@@ -26,12 +25,9 @@ RUN cd /var/lib \
         && echo "  host: localhost" >> config/database.yml \
         && echo "  username: root" >> config/database.yml \
         && echo "  password: redmine" >> config/database.yml \
-        && echo "gem 'puma'" >> Gemfile.local \
         # && echo 'config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))' > config/additional_environment.rb \
         && gem install bundle \
-        # && gem install rake \
-        && bundle install --without development test \
-        && bundle exec rake generate_secret_token 
+        && bundle install --without development test 
 
 ADD redmine/Makefile /var/lib/redmine/
 RUN cd /var/lib/redmine \
@@ -50,12 +46,10 @@ WORKDIR /var/lib/redmine
 
 VOLUME ["/var/lib/redmine/files"]
 
-RUN echo "#!/bin/sh" > /usr/local/bin/entrypoint.sh \
-    && echo "/usr/bin/mysqld_safe &" >> /usr/local/bin/entrypoint.sh \
-    && echo "exec '$@'" >> /usr/local/bin/entrypoint.sh \
-    && chmod +x /usr/local/bin/entrypoint.sh
-
-# COPY entrypoint.sh /usr/local/bin/
+RUN echo "#!/bin/sh" > /var/lib/redmine/entrypoint.sh \
+    && echo "/usr/bin/mysqld_safe &" >> /var/lib/redmine/entrypoint.sh \
+    && echo "exec '$@'" >> /var/lib/redmine/entrypoint.sh \
+    && chmod +x /var/lib/redmine/entrypoint.sh
 
 ENTRYPOINT ["entrypoint.sh"]
 
