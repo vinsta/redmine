@@ -29,11 +29,13 @@ RUN cd /var/lib \
         && echo "gem 'puma'" >> Gemfile.local \
         # && echo 'config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))' > config/additional_environment.rb \
         && gem install bundle \
+        # && gem install rake \
         && bundle install --without development test \
         && bundle exec rake generate_secret_token 
 
 ADD redmine/Makefile /var/lib/redmine/
-RUN make rake
+RUN cd /var/lib/redmine \
+    && make rake
 
 RUN  rm -rf ~/.bundle/ \
     && rm -rf /usr/lib/ruby/gems/*/cache/* \
