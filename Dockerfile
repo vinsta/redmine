@@ -35,7 +35,7 @@ RUN cd /var/lib \
 ADD redmine/Makefile /var/lib/redmine/
 RUN make rake
 
-RUN  rm -rf ~/.bundle/ 
+RUN  rm -rf ~/.bundle/ \
     && rm -rf /usr/lib/ruby/gems/*/cache/* \
     && apk --purge del .redmine-builddpes \
     && rm -rf /var/cache/apk/* \
