@@ -15,10 +15,7 @@ RUN set -ex \
     && sed -i '/\[mysqld\]/a\user = root' /etc/my.cnf \
     && mysql_install_db --user=root 
 
-RUN  /usr/bin/mysqld_safe & \
-    && mysqladmin -u root password redmine \
-    && mysql -u root -predmine -e "CREATE DATABASE redmine CHARACTER SET utf8mb4" \
-    && cd /var/lib \
+RUN cd /var/lib \
     && curl -sSL https://github.com/redmine/redmine/archive/master.tar.gz | tar xz \
     && mv redmine-* redmine \
     && cd redmine \
@@ -33,11 +30,12 @@ RUN  /usr/bin/mysqld_safe & \
         # && echo 'config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))' > config/additional_environment.rb \
         && gem install bundle \
         && bundle install --without development test \
-        && bundle exec rake generate_secret_token \
-        && RAILS_ENV=production bundle exec rake db:migrate \
-        && RAILS_ENV=production REDMINE_LANG=zh bundle exec rake redmine:load_default_data \
-    && mysqladmin shutdown \
-    && rm -rf ~/.bundle/ \
+        && bundle exec rake generate_secret_token 
+
+ADD redmine/Makefile /var/lib/redmine/
+RUN make rake
+
+RUN  rm -rf ~/.bundle/ 
     && rm -rf /usr/lib/ruby/gems/*/cache/* \
     && apk --purge del .redmine-builddpes \
     && rm -rf /var/cache/apk/* \
