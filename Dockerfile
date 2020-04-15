@@ -32,7 +32,7 @@ RUN cd /var/lib \
 RUN git clone -b feature/redmine3 https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs \
     && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
     && sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", "~> 3.25.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
-    && sed -i -e 's/gem "holidays", "~>.*[0-9]"/gem "holidays", ">=2"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile 
+    && sed -i -e 's/gem "holidays", "~>.*[0-9]"/gem "holidays", "~> 8.1.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile 
     # scm creator
     # && svn co http://svn.s-andy.com/scm-creator /var/lib/redmine/plugins/redmine_scm \
     # issue template
