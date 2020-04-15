@@ -26,13 +26,16 @@ RUN cd /var/lib \
         && echo "  username: root" >> config/database.yml \
         && echo "  password: redmine" >> config/database.yml \
         # && echo 'config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))' > config/additional_environment.rb \
+        && git clone -b feature/redmine3 https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs \
+        && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
+        && sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", "~> 3.25.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
         && gem install bundle \
         && bundle install --without development test 
 
-RUN git clone -b feature/redmine3 https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs \
-    && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
-    && sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", "~> 3.25.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
-    && sed -i -e 's/gem "holidays", "~>.*[0-9]"/gem "holidays", "~> 8.1.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile 
+# RUN git clone -b feature/redmine3 https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs \
+#    && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
+#    && sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", "~> 3.25.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
+    # && sed -i -e 's/gem "holidays", "~>.*[0-9]"/gem "holidays", "~> 8.1.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile 
     # scm creator
     # && svn co http://svn.s-andy.com/scm-creator /var/lib/redmine/plugins/redmine_scm \
     # issue template
