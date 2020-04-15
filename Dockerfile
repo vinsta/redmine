@@ -7,7 +7,7 @@ RUN set -ex \
     && apk --update add --virtual .redmine-deps \
          ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client \
     && apk add --virtual .redmine-builddpes \
-         subversion build-base ruby-dev zlib-dev mysql-dev \
+         subversion git mercurial build-base ruby-dev zlib-dev mysql-dev \
     && mkdir -p /run/mysqld \
     && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
@@ -29,6 +29,24 @@ RUN cd /var/lib \
         && gem install bundle \
         && bundle install --without development test 
 
+RUN git clone -b feature/redmine3 https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs \
+    # && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
+    # && sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", "~> 3.31.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
+    # scm creator
+    && svn co http://svn.s-andy.com/scm-creator /var/lib/redmine/plugins/redmine_scm \
+    # issue template
+    && hg clone https://bitbucket.org/akiko_pusu/redmine_issue_templates /var/lib/redmine/plugins/redmine_issue_templates \
+    # code review
+    && hg clone https://bitbucket.org/haru_iida/redmine_code_review /var/lib/redmine/plugins/redmine_code_review \
+    # clipboard_image_paste
+    && git clone https://github.com/peclik/clipboard_image_paste.git /var/lib/redmine/plugins/clipboard_image_paste \
+    # excel export
+    && git clone https://github.com/two-pack/redmine_xls_export.git /var/lib/redmine/plugins/redmine_xls_export \
+    # && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", ">= 1.6.7.2"/g' /var/lib/redmine/plugins/redmine_xls_export/Gemfile \
+    # drafts
+    && git clone https://github.com/jbbarth/redmine_drafts.git /var/lib/redmine/plugins/redmine_drafts
+
+ADD scm-post-create.sh /var/lib/redmine/
 ADD redmine/Makefile /var/lib/redmine/
 RUN cd /var/lib/redmine \
     && make rake
