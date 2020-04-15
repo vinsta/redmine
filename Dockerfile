@@ -29,6 +29,7 @@ RUN cd /var/lib \
         && git clone -b feature/redmine3 https://github.com/backlogs/redmine_backlogs.git /var/lib/redmine/plugins/redmine_backlogs \
         && sed -i -e 's/gem "nokogiri".*/gem "nokogiri", "~> 1.10.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
         && sed -i -e 's/gem "capybara", "~> 1"/gem "capybara", "~> 3.25.0"/g' /var/lib/redmine/plugins/redmine_backlogs/Gemfile \
+        && sed -i -e 's/alias_method_chain/alias_method/g' /var/lib/redmine/plugins/redmine_backlogs/lib/backlogs_time_report_patch.rb \
         && gem install bundle \
         && bundle install --without development test 
 
