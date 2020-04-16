@@ -29,7 +29,7 @@ RUN set -ex \
 
 ADD redmine/Makefile /var/lib/redmine/
 RUN cd /var/lib/redmine \
-    && make rake
+    && make rake \
     && rm -rf ~/.bundle/ \
     && rm -rf /usr/lib/ruby/gems/*/cache/* \
     && apk --purge del .redmine-builddpes \
