@@ -24,11 +24,13 @@ RUN set -ex \
     && echo "  host: localhost" >> config/database.yml \
     && echo "  username: root" >> config/database.yml \
     && echo "  password: redmine" >> config/database.yml \
-    && gem install bundle \
-    && bundle install --without development test 
+    && gem install bundle 
 
+ADD plugins/redmine_checklists /var/lib/redmine/plugins/
 ADD redmine/Makefile /var/lib/redmine/
+
 RUN cd /var/lib/redmine \
+    && bundle install --without development test \
     && make rake \
     && rm -rf ~/.bundle/ \
     && rm -rf /usr/lib/ruby/gems/*/cache/* \
