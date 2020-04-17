@@ -5,9 +5,9 @@ ENV RAILS_ENV=production
 RUN set -ex \
     && export BUNDLE_SILENCE_ROOT_WARNING=1 \
     && apk --update add --virtual .redmine-deps \
-        ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client \
+        ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
     && apk add --virtual .redmine-builddpes \
-        subversion build-base ruby-dev zlib-dev mysql-dev \
+        subversion build-base ruby-dev zlib-dev \
     && mkdir -p /run/mysqld \
     && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
@@ -41,7 +41,7 @@ RUN cd /var/lib/redmine \
 
 RUN echo "#!/bin/sh" > /var/lib/redmine/entrypoint.sh \
     && echo "/usr/bin/mysqld_safe &" >> /var/lib/redmine/entrypoint.sh \
-    && echo "exec '\$@'" >> /var/lib/redmine/entrypoint.sh \
+    && echo "exec \"\$@\"" >> /var/lib/redmine/entrypoint.sh \
     && chmod +x /var/lib/redmine/entrypoint.sh
 
 USER redmine:redmine
