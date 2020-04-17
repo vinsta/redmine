@@ -39,16 +39,16 @@ RUN cd /var/lib/redmine \
     && adduser -h /redmine -s /sbin/nologin -D -H redmine \
     && chown -R redmine:redmine /var/lib/redmine
 
+RUN echo "#!/bin/sh" > /var/lib/redmine/entrypoint.sh \
+    && echo "/usr/bin/mysqld_safe &" >> /var/lib/redmine/entrypoint.sh \
+    && echo "exec '\$@'" >> /var/lib/redmine/entrypoint.sh \
+    && chmod +x /var/lib/redmine/entrypoint.sh
+
 USER redmine:redmine
 
 WORKDIR /var/lib/redmine
 
 VOLUME ["/var/lib/redmine/files"]
-
-RUN echo "#!/bin/sh" > /var/lib/redmine/entrypoint.sh \
-    && echo "/usr/bin/mysqld_safe &" >> /var/lib/redmine/entrypoint.sh \
-    && echo "exec '$@'" >> /var/lib/redmine/entrypoint.sh \
-    && chmod +x /var/lib/redmine/entrypoint.sh
 
 ENTRYPOINT ["entrypoint.sh"]
 
