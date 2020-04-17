@@ -26,7 +26,7 @@ RUN set -ex \
     && echo "  password: redmine" >> config/database.yml \
     && gem install bundle 
 
-ADD plugins/redmine_checklists /var/lib/redmine/plugins/
+ADD plugins/redmine_checklists /var/lib/redmine/plugins/redmine_checklists
 ADD redmine/Makefile /var/lib/redmine/
 
 RUN cd /var/lib/redmine \
