@@ -50,7 +50,7 @@ WORKDIR /var/lib/redmine
 
 VOLUME ["/var/lib/redmine/files"]
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/var/lib/redmine/entrypoint.sh"]
 
 EXPOSE 3000
 
