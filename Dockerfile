@@ -24,6 +24,7 @@ RUN set -ex \
     && echo "  host: localhost" >> config/database.yml \
     && echo "  username: root" >> config/database.yml \
     && echo "  password: redmine" >> config/database.yml \
+    && echo "gem 'puma'" >> Gemfile.local \
     && gem install bundle 
 
 ADD plugins/redmine_checklists /var/lib/redmine/plugins/redmine_checklists
