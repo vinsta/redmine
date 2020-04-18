@@ -24,11 +24,12 @@ RUN set -ex \
     && echo "  host: localhost" >> config/database.yml \
     && echo "  username: root" >> config/database.yml \
     && echo "  password: redmine" >> config/database.yml \
+    && git clone https://github.com/paginagmbh/redmine_lightbox2.git plugins/redmine_lightbox2 \
+    && git clone https://github.com/peclik/clipboard_image_paste.git plugins/clipboard_image_paste \
     && echo "gem 'puma', '~> 3.7'" >> Gemfile.local \
     && gem install bundle 
 
-ADD plugins/redmine_checklists /var/lib/redmine/plugins/redmine_checklists
-ADD plugins/redmine_agile /var/lib/redmine/plugins/redmine_agile
+ADD plugins /var/lib/redmine/plugins
 ADD redmine/Makefile /var/lib/redmine/
 
 RUN cd /var/lib/redmine \
