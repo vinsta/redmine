@@ -5,9 +5,9 @@ ENV RAILS_ENV=production
 RUN set -ex \
     && export BUNDLE_SILENCE_ROOT_WARNING=1 \
     && apk --update add --virtual .redmine-deps \
-        subversion ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
+        ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
     && apk add --virtual .redmine-builddpes \
-        build-base ruby-dev zlib-dev \
+        subversion git build-base ruby-dev zlib-dev \
     && mkdir -p /run/mysqld \
     && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
