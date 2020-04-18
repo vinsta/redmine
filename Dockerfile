@@ -28,6 +28,7 @@ RUN set -ex \
     && gem install bundle 
 
 ADD plugins/redmine_checklists /var/lib/redmine/plugins/redmine_checklists
+ADD plugins/redmine_agile /var/lib/redmine/plugins/redmine_agile
 ADD redmine/Makefile /var/lib/redmine/
 
 RUN cd /var/lib/redmine \
