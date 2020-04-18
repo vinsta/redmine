@@ -38,7 +38,8 @@ RUN cd /var/lib/redmine \
     && apk --purge del .redmine-builddpes \
     && rm -rf /var/cache/apk/* \
     && adduser -h /redmine -s /sbin/nologin -D -H redmine \
-    && chown -R redmine:redmine /var/lib/redmine
+    && chown -R redmine:redmine /var/lib/redmine /var/lib/mysql \
+    && chown -R redmine:redmine /run/mysqld
 
 RUN echo "#!/bin/sh" > /var/lib/redmine/entrypoint.sh \
     && echo "/usr/bin/mysqld_safe &" >> /var/lib/redmine/entrypoint.sh \
