@@ -26,6 +26,7 @@ RUN set -ex \
     && echo "  password: redmine" >> config/database.yml \
     && git clone https://github.com/paginagmbh/redmine_lightbox2.git plugins/redmine_lightbox2 \
     && git clone https://github.com/peclik/clipboard_image_paste.git plugins/clipboard_image_paste \
+    && sed -i -e 's/ActionDispatch.*/ActiveSupport::Reloader\.to_prepare do/g' plugins/clipboard_image_paste/init.rb \
     && echo "gem 'puma', '~> 3.7'" >> Gemfile.local \
     && gem install bundle 
 
