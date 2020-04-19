@@ -13,7 +13,8 @@ RUN set -ex \
     && sed -i '/\[mysqld\]/a\user = root' /etc/my.cnf \
     && mysql_install_db --user=root
 
-RUN cd /var/lib \
+RUN apk add --virtual .redmine-tools subversion git \
+    && cd /var/lib \
     && svn co http://svn.redmine.org/redmine/branches/4.1-stable/ /var/lib/redmine \
     && cd redmine \
     && rm files/delete.me log/delete.me \
@@ -29,10 +30,11 @@ RUN cd /var/lib \
     # && git clone https://github.com/peclik/clipboard_image_paste.git plugins/clipboard_image_paste \
     # && sed -i -e 's/ActionDispatch.*/ActiveSupport::Reloader\.to_prepare do/g' plugins/clipboard_image_paste/init.rb \
     # && sed -i -e 's/alias_method_chain/alias_method/g' plugins/clipboard_image_paste/lib/clipboard_image_paste/attachment_patch.rb \
-    && echo "gem 'puma', '~> 3.7'" >> Gemfile.local
+    && echo "gem 'puma', '~> 3.7'" >> Gemfile.local \
+    && apk --purge del .redmine-tools 
 
 RUN apk add --virtual .redmine-builddpes \
-        subversion git build-base ruby-dev zlib-dev \
+        build-base ruby-dev zlib-dev \
     && gem install bundle \
     && bundle install --without development test \
     && echo "rake:" > Makefile \
