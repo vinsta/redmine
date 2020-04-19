@@ -34,14 +34,14 @@ RUN set -ex \
     && gem install bundle \
     && bundle install --without development test \
     && echo "rake:" > Makefile \
-    && echo "    /usr/bin/mysqld_safe &" >> Makefile \
-    && echo "    sleep 10" >> Makefile \
-    && echo "    mysqladmin -u root password redmine" >> Makefile \
-    && echo "    mysql -u root -predmine -e \"CREATE DATABASE redmine DEFAULT CHARACTER SET utf8mb4;\"" >> Makefile \
-    && echo "    bundle exec rake generate_secret_token" >> Makefile \
-    && echo "    RAILS_ENV=production bundle exec rake db:migrate" >> Makefile \
-    && echo "    RAILS_ENV=production bundle exec rake redmine:plugins:migrate" >> Makefile \
-    && echo "    mysqladmin shutdown" >> Makefile \
+    && echo -e "\t/usr/bin/mysqld_safe &" >> Makefile \
+    && echo -e "\tsleep 10" >> Makefile \
+    && echo -e "\tmysqladmin -u root password redmine" >> Makefile \
+    && echo -e "\tmysql -u root -predmine -e \"CREATE DATABASE redmine DEFAULT CHARACTER SET utf8mb4;\"" >> Makefile \
+    && echo -e "\tbundle exec rake generate_secret_token" >> Makefile \
+    && echo -e "\tRAILS_ENV=production bundle exec rake db:migrate" >> Makefile \
+    && echo -e "\tRAILS_ENV=production bundle exec rake redmine:plugins:migrate" >> Makefile \
+    && echo -e "\tmysqladmin shutdown" >> Makefile \
     && make rake \
     && rm -rf ~/.bundle/ \
     && rm -rf /usr/lib/ruby/gems/*/cache/* \
