@@ -35,6 +35,7 @@ RUN apk add --virtual .redmine-tools subversion git \
 
 RUN apk add --virtual .redmine-builddpes \
         build-base ruby-dev zlib-dev \
+    && cd /var/lib/redmine \
     && gem install bundle \
     && bundle install --without development test \
     && echo "rake:" > Makefile \
