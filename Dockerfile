@@ -6,6 +6,7 @@ RUN set -ex \
     && export BUNDLE_SILENCE_ROOT_WARNING=1 \
     && apk add --no-cache --virtual .redmine-deps \
         ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
+    && rm -rf /var/cache/apk/* \
     && mkdir -p /run/mysqld \
     && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
@@ -31,6 +32,7 @@ RUN apk add --no-cache --virtual .redmine-tools subversion git \
     # && sed -i -e 's/ActionDispatch.*/ActiveSupport::Reloader\.to_prepare do/g' plugins/clipboard_image_paste/init.rb \
     # && sed -i -e 's/alias_method_chain/alias_method/g' plugins/clipboard_image_paste/lib/clipboard_image_paste/attachment_patch.rb \
     && echo "gem 'puma', '~> 3.7'" >> Gemfile.local \
+    && rm -rf /var/cache/apk/* \
     && apk --purge del .redmine-tools 
 
 RUN apk add --no-cache --virtual .redmine-builddpes \
