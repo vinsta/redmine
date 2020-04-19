@@ -5,7 +5,7 @@ ENV RAILS_ENV=production
 RUN set -ex \
     && export BUNDLE_SILENCE_ROOT_WARNING=1 \
     && apk --update add --virtual .redmine-deps \
-         ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
+        ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
     && mkdir -p /run/mysqld \
     && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
@@ -32,7 +32,7 @@ RUN cd /var/lib \
     && echo "gem 'puma', '~> 3.7'" >> Gemfile.local
 
 RUN apk add --virtual .redmine-builddpes \
-         subversion git build-base ruby-dev zlib-dev \
+        subversion git build-base ruby-dev zlib-dev \
     && gem install bundle \
     && bundle install --without development test \
     && echo "rake:" > Makefile \
@@ -48,7 +48,7 @@ RUN apk add --virtual .redmine-builddpes \
     && rm -rf ~/.bundle/ \
     && rm -rf /usr/lib/ruby/gems/*/cache/* \
     && apk --purge del .redmine-builddpes \
-    && rm -rf /var/cache/apk/* \
+    && rm -rf /var/cache/apk/* 
 
 RUN adduser -h /redmine -s /sbin/nologin -D -H redmine \
     && chown -R redmine:redmine /var/lib/redmine /var/lib/mysql /run/mysqld \
