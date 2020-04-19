@@ -4,7 +4,7 @@ MAINTAINER luckyv
 ENV RAILS_ENV=production
 RUN set -ex \
     && export BUNDLE_SILENCE_ROOT_WARNING=1 \
-    && apk --update add --virtual .redmine-deps \
+    && apk add --no-cache --virtual .redmine-deps \
         ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
     && mkdir -p /run/mysqld \
     && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
@@ -13,7 +13,7 @@ RUN set -ex \
     && sed -i '/\[mysqld\]/a\user = root' /etc/my.cnf \
     && mysql_install_db --user=root
 
-RUN apk add --virtual .redmine-tools subversion git \
+RUN apk add --no-cache --virtual .redmine-tools subversion git \
     && cd /var/lib \
     && svn co http://svn.redmine.org/redmine/branches/4.1-stable/ /var/lib/redmine \
     && cd redmine \
@@ -33,7 +33,7 @@ RUN apk add --virtual .redmine-tools subversion git \
     && echo "gem 'puma', '~> 3.7'" >> Gemfile.local \
     && apk --purge del .redmine-tools 
 
-RUN apk add --virtual .redmine-builddpes \
+RUN apk add --no-cache --virtual .redmine-builddpes \
         build-base ruby-dev zlib-dev \
     && cd /var/lib/redmine \
     && gem install bundle \
