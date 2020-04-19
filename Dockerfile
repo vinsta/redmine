@@ -5,9 +5,9 @@ ENV RAILS_ENV=production
 RUN set -ex \
     && export BUNDLE_SILENCE_ROOT_WARNING=1 \
     && apk --update add --virtual .redmine-deps \
-        ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
+         ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client \
     && apk add --virtual .redmine-builddpes \
-        subversion git build-base ruby-dev zlib-dev \
+         subversion git build-base ruby-dev zlib-dev mysql-dev \
     && mkdir -p /run/mysqld \
     && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
@@ -24,28 +24,32 @@ RUN set -ex \
     && echo "  host: localhost" >> config/database.yml \
     && echo "  username: root" >> config/database.yml \
     && echo "  password: redmine" >> config/database.yml \
+    && rm plugins/* \
+    && git clone https://github.com/vinsta/redmine_plugins.git plugins \
     && git clone https://github.com/paginagmbh/redmine_lightbox2.git plugins/redmine_lightbox2 \
-    && git clone https://github.com/peclik/clipboard_image_paste.git plugins/clipboard_image_paste \
-    && sed -i -e 's/ActionDispatch.*/ActiveSupport::Reloader\.to_prepare do/g' plugins/clipboard_image_paste/init.rb \
-    && sed -i -e 's/alias_method_chain/alias_method/g' plugins/clipboard_image_paste/lib/clipboard_image_paste/attachment_patch.rb \
+    # && git clone https://github.com/peclik/clipboard_image_paste.git plugins/clipboard_image_paste \
+    # && sed -i -e 's/ActionDispatch.*/ActiveSupport::Reloader\.to_prepare do/g' plugins/clipboard_image_paste/init.rb \
+    # && sed -i -e 's/alias_method_chain/alias_method/g' plugins/clipboard_image_paste/lib/clipboard_image_paste/attachment_patch.rb \
     && echo "gem 'puma', '~> 3.7'" >> Gemfile.local \
-    && gem install bundle 
-
-ADD plugins /var/lib/redmine/plugins
-ADD redmine/Makefile /var/lib/redmine/
-
-RUN cd /var/lib/redmine \
+    && gem install bundle \
     && bundle install --without development test \
+    && echo "rake:" > Makefile \
+    && echo "    /usr/bin/mysqld_safe &" >> Makefile \
+    && echo "    sleep 10" >> Makefile \
+    && echo "    mysqladmin -u root password redmine" >> Makefile \
+    && echo "    mysql -u root -predmine -e \"CREATE DATABASE redmine DEFAULT CHARACTER SET utf8mb4;\"" >> Makefile \
+    && echo "    bundle exec rake generate_secret_token" >> Makefile \
+    && echo "    RAILS_ENV=production bundle exec rake db:migrate" >> Makefile \
+    && echo "    RAILS_ENV=production bundle exec rake redmine:plugins:migrate" >> Makefile \
+    && echo "    mysqladmin shutdown" >> Makefile \
     && make rake \
     && rm -rf ~/.bundle/ \
     && rm -rf /usr/lib/ruby/gems/*/cache/* \
     && apk --purge del .redmine-builddpes \
     && rm -rf /var/cache/apk/* \
     && adduser -h /redmine -s /sbin/nologin -D -H redmine \
-    && chown -R redmine:redmine /var/lib/redmine /var/lib/mysql \
-    && chown -R redmine:redmine /run/mysqld
-
-RUN echo "#!/bin/sh" > /var/lib/redmine/entrypoint.sh \
+    && chown -R redmine:redmine /var/lib/redmine /var/lib/mysql /run/mysqld \
+    && echo "#!/bin/sh" > /var/lib/redmine/entrypoint.sh \
     && echo "/usr/bin/mysqld_safe &" >> /var/lib/redmine/entrypoint.sh \
     && echo "sleep 10" >> /var/lib/redmine/entrypoint.sh \
     && echo "exec \"\$@\"" >> /var/lib/redmine/entrypoint.sh \
