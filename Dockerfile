@@ -37,8 +37,8 @@ RUN set -ex \
     && echo -e "\tmysqladmin -u root password redmine" >> Makefile \
     && echo -e "\tmysql -u root -predmine -e \"CREATE DATABASE redmine DEFAULT CHARACTER SET utf8mb4;\"" >> Makefile \
     && echo -e "\tbundle exec rake generate_secret_token" >> Makefile \
-    && echo -e "\tRAILS_ENV=production EDMINE_LANG=zh bundle exec rake redmine:load_default_data" >> Makefile \
     && echo -e "\tRAILS_ENV=production bundle exec rake db:migrate" >> Makefile \
+    && echo -e "\tRAILS_ENV=production REDMINE_LANG=zh bundle exec rake redmine:load_default_data" >> Makefile \
     && echo -e "\tRAILS_ENV=production bundle exec rake redmine:plugins:migrate" >> Makefile \
     && echo -e "\tmysqladmin shutdown" >> Makefile \
     && make rake \
