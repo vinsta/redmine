@@ -6,15 +6,14 @@ RUN set -ex \
     && export BUNDLE_SILENCE_ROOT_WARNING=1 \
     && apk add --no-cache --virtual .redmine-deps \
         ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
-    && rm -rf /var/cache/apk/* \
+    && apk add --no-cache --virtual .redmine-builddpes \
+        subversion git build-base ruby-dev zlib-dev \
     && mkdir -p /run/mysqld \
     && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\datadir = \/var\/lib\/mysql' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\user = root' /etc/my.cnf \
-    && mysql_install_db --user=root
-
-RUN apk add --no-cache --virtual .redmine-tools subversion git \
+    && mysql_install_db --user=root \
     && cd /var/lib \
     && svn co http://svn.redmine.org/redmine/branches/4.1-stable/ /var/lib/redmine \
     && cd redmine \
@@ -27,17 +26,8 @@ RUN apk add --no-cache --virtual .redmine-tools subversion git \
     && echo "  password: redmine" >> config/database.yml \
     && rm plugins/* \
     && git clone https://github.com/vinsta/redmine_plugins.git plugins \
-    # && git clone https://github.com/paginagmbh/redmine_lightbox2.git plugins/redmine_lightbox2 \
-    # && git clone https://github.com/peclik/clipboard_image_paste.git plugins/clipboard_image_paste \
-    # && sed -i -e 's/ActionDispatch.*/ActiveSupport::Reloader\.to_prepare do/g' plugins/clipboard_image_paste/init.rb \
-    # && sed -i -e 's/alias_method_chain/alias_method/g' plugins/clipboard_image_paste/lib/clipboard_image_paste/attachment_patch.rb \
+    && git clone https://github.com/paginagmbh/redmine_lightbox2.git plugins/redmine_lightbox2 \
     && echo "gem 'puma', '~> 3.7'" >> Gemfile.local \
-    && rm -rf /var/cache/apk/* \
-    && apk --purge del .redmine-tools 
-
-RUN apk add --no-cache --virtual .redmine-builddpes \
-        build-base ruby-dev zlib-dev \
-    && cd /var/lib/redmine \
     && gem install bundle \
     && bundle install --without development test \
     && echo "rake:" > Makefile \
@@ -53,9 +43,8 @@ RUN apk add --no-cache --virtual .redmine-builddpes \
     && rm -rf ~/.bundle/ \
     && rm -rf /usr/lib/ruby/gems/*/cache/* \
     && apk --purge del .redmine-builddpes \
-    && rm -rf /var/cache/apk/* 
-
-RUN adduser -h /redmine -s /sbin/nologin -D -H redmine \
+    && rm -rf /var/cache/apk/* \
+    && adduser -h /redmine -s /sbin/nologin -D -H redmine \
     && chown -R redmine:redmine /var/lib/redmine /var/lib/mysql /run/mysqld \
     && echo "#!/bin/sh" > /var/lib/redmine/entrypoint.sh \
     && echo "/usr/bin/mysqld_safe &" >> /var/lib/redmine/entrypoint.sh \
