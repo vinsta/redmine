@@ -26,8 +26,8 @@ RUN set -ex \
     && echo "  password: redmine" >> config/database.yml \
     && rm plugins/* \
     && git clone https://github.com/vinsta/redmine_plugins.git plugins \
-    && git clone https://github.com/paginagmbh/redmine_lightbox2.git plugins/redmine_lightbox2 \
     && rm -rf plugins/redmineup_tags \
+    && git clone https://github.com/paginagmbh/redmine_lightbox2.git plugins/redmine_lightbox2 \
     && echo "gem 'puma', '~> 3.7'" >> Gemfile.local \
     && gem install bundle \
     && bundle install --without development test \
