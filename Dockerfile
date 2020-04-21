@@ -5,9 +5,9 @@ ENV RAILS_ENV=production
 RUN set -ex \
     && export BUNDLE_SILENCE_ROOT_WARNING=1 \
     && apk add --no-cache --virtual .redmine-deps \
-        ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
+        subversion ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
     && apk add --no-cache --virtual .redmine-builddpes \
-        subversion git build-base ruby-dev zlib-dev \
+        git build-base ruby-dev zlib-dev \
     && mkdir -p /run/mysqld \
     && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
     && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
@@ -28,7 +28,6 @@ RUN set -ex \
     && git clone https://github.com/vinsta/redmine_plugins.git plugins \
     && mv plugins/redmineup_tags ./ \
     && git clone https://github.com/paginagmbh/redmine_lightbox2.git plugins/redmine_lightbox2 \
-    && git clone https://github.com/bradbeattie/redmine-graphs-plugin.git plugins/redmine_graphs \
     && echo "gem 'puma', '~> 3.7'" >> Gemfile.local \
     && gem install bundle \
     && bundle install --without development test \
@@ -40,11 +39,8 @@ RUN set -ex \
     && echo -e "\tbundle exec rake generate_secret_token" >> Makefile \
     && echo -e "\tRAILS_ENV=production bundle exec rake db:migrate" >> Makefile \
     && echo -e "\tRAILS_ENV=production REDMINE_LANG=zh bundle exec rake redmine:load_default_data" >> Makefile \
-    && echo -e "\tRAILS_ENV=production NAME=redmine_checklists bundle exec rake redmine:plugins:migrate" >> Makefile \
-    && echo -e "\tRAILS_ENV=production NAME=redmine_agile bundle exec rake redmine:plugins:migrate" >> Makefile \
-    && echo -e "\tRAILS_ENV=production NAME=easy_gantt bundle exec rake redmine:plugins:migrate" >> Makefile \
-    && echo -e "\tRAILS_ENV=production NAME=redmine_lightbox2 bundle exec rake redmine:plugins:migrate" >> Makefile \
-    && echo -e "\tRAILS_ENV=production NAME=redmine_graphs bundle exec rake redmine:plugins:migrate" >> Makefile \
+    && echo -e "\tmv /var/lib/redmine/redmineup_tags /var/lib/redmine/plugins/" >> Makefile \
+    && echo -e "\tRAILS_ENV=production bundle exec rake redmine:plugins:migrate" >> Makefile \
     && echo -e "\tmysqladmin shutdown" >> Makefile \
     && make rake \
     && rm -rf ~/.bundle/ \
