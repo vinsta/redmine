@@ -59,8 +59,6 @@ USER redmine:redmine
 
 WORKDIR /var/lib/redmine
 
-VOLUME ["/var/lib/redmine/files"]
-
 ENTRYPOINT ["/var/lib/redmine/entrypoint.sh"]
 
 EXPOSE 3000
