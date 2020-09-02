@@ -5,7 +5,7 @@ ENV RAILS_ENV=production
 RUN set -ex \
     && export BUNDLE_SILENCE_ROOT_WARNING=1 \
     && apk --update add --virtual .redmine-deps \
-        subversion git imagemagick ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
+        subversion git imagemagick ruby-2.6 ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client mysql-dev \
     && apk add --virtual .redmine-builddpes \
         build-base ruby-dev zlib-dev \
     && mkdir -p /run/mysqld \
