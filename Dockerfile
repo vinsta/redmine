@@ -53,7 +53,8 @@ RUN set -ex \
     && echo "/usr/bin/mysqld_safe &" >> /var/lib/redmine/entrypoint.sh \
     && echo "sleep 10" >> /var/lib/redmine/entrypoint.sh \
     && echo "exec \"\$@\"" >> /var/lib/redmine/entrypoint.sh \
-    && chmod +x /var/lib/redmine/entrypoint.sh
+    && chmod +x /var/lib/redmine/entrypoint.sh \
+    && echo "nameserver 192.168.3.100"
 
 USER redmine:redmine
 
