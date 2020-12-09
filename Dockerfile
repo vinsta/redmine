@@ -54,7 +54,6 @@ RUN set -ex \
     && echo "sleep 10" >> /var/lib/redmine/entrypoint.sh \
     && echo "exec \"\$@\"" >> /var/lib/redmine/entrypoint.sh \
     && chmod +x /var/lib/redmine/entrypoint.sh \
-    && echo "nameserver 192.168.3.100" > /etc/resolv.conf \
     && chmod 4755 /bin/busybox
 
 USER redmine:redmine
