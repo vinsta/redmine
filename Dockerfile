@@ -53,10 +53,9 @@ RUN set -ex \
     && echo "/usr/bin/mysqld_safe &" >> /var/lib/redmine/entrypoint.sh \
     && echo "sleep 10" >> /var/lib/redmine/entrypoint.sh \
     && echo "exec \"\$@\"" >> /var/lib/redmine/entrypoint.sh \
-    && chmod +x /var/lib/redmine/entrypoint.sh \
-    && chmod 4755 /bin/busybox
+    && chmod +x /var/lib/redmine/entrypoint.sh 
 
-USER redmine:redmine
+# USER redmine:redmine
 
 WORKDIR /var/lib/redmine
 
