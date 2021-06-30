@@ -1,0 +1,70 @@
+FROM alpine
+MAINTAINER luckyv
+
+ENV RAILS_ENV=production
+RUN set -ex \
+    && export BUNDLE_SILENCE_ROOT_WARNING=1 \
+    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories \
+    && apk --update add --virtual .redmine-deps \
+         ruby ruby-bundler ruby-bigdecimal ruby-json tzdata mysql mysql-client \
+    && apk add --virtual .redmine-builddpes \
+         subversion git build-base ruby-dev zlib-dev mysql-dev \
+    && mkdir -p /run/mysqld \
+    && sed -i '/\[mysqld\]/a\socket = \/run\/mysqld\/mysqld.sock' /etc/my.cnf \
+    && sed -i '/\[mysqld\]/a\port = 3306' /etc/my.cnf \
+    && sed -i '/\[mysqld\]/a\datadir = \/var\/lib\/mysql' /etc/my.cnf \
+    && sed -i '/\[mysqld\]/a\user = root' /etc/my.cnf \
+    && mysql_install_db --user=root \
+    && cd /var/lib \
+    && svn co http://svn.redmine.org/redmine/branches/4.1-stable/ /var/lib/redmine \
+	# && git clone https://github.com/redmine/redmine.git /var/lib/redmine \
+    && cd redmine \
+    && rm files/delete.me log/delete.me \
+    && sed -i 's/rubygems\.org/gems\.ruby-china\.com/g' ./Gemfile \
+    && echo "$RAILS_ENV:" > config/database.yml \
+    && echo "  adapter: mysql2" >> config/database.yml \
+    && echo "  database: redmine" >> config/database.yml \
+    && echo "  host: localhost" >> config/database.yml \
+    && echo "  username: root" >> config/database.yml \
+    && echo "  password: redmine" >> config/database.yml \
+    && git clone https://github.com/vinsta/redmine_plugins.git plugins \
+    && git clone https://github.com/paginagmbh/redmine_lightbox2.git plugins/redmine_lightbox2 \
+    # && git clone https://github.com/peclik/clipboard_image_paste.git plugins/clipboard_image_paste \
+    # && sed -i -e 's/ActionDispatch.*/ActiveSupport::Reloader\.to_prepare do/g' plugins/clipboard_image_paste/init.rb \
+    # && sed -i -e 's/alias_method_chain/alias_method/g' plugins/clipboard_image_paste/lib/clipboard_image_paste/attachment_patch.rb \
+    && echo "gem 'puma', '~> 3.7'" >> Gemfile.local \
+    # && echo 'config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))' > config/additional_environment.rb \
+    && gem sources --add https://gems.ruby-china.com --remove https://rubygems.org \
+    && gem install bundle \
+    && bundle install --without development test \
+    && echo "rake:" > Makefile \
+    && echo "    /usr/bin/mysqld_safe &" >> Makefile \
+    && echo "    sleep 10" >> Makefile \
+    && echo "    mysqladmin -u root password redmine" >> Makefile \
+    && echo "    mysql -u root -predmine -e \"CREATE DATABASE redmine DEFAULT CHARACTER SET utf8mb4;\"" >> Makefile \
+    && echo "    bundle exec rake generate_secret_token" >> Makefile \
+    && echo "    RAILS_ENV=production bundle exec rake db:migrate" >> Makefile \
+    && echo "    RAILS_ENV=production bundle exec rake redmine:plugins:migrate" >> Makefile \
+    && echo "    mysqladmin shutdown" >> Makefile \
+    && make rake \
+    && rm -rf ~/.bundle/ \
+    && rm -rf /usr/lib/ruby/gems/*/cache/* \
+    && apk --purge del .redmine-builddpes \
+    && rm -rf /var/cache/apk/* \
+    && adduser -h /redmine -s /sbin/nologin -D -H redmine \
+    && chown -R redmine:redmine /var/lib/redmine \
+    && echo "#!/bin/sh" > /var/lib/redmine/entrypoint.sh \
+    && echo "/usr/bin/mysqld_safe &" >> /var/lib/redmine/entrypoint.sh \
+    && echo "sleep 10" >> /var/lib/redmine/entrypoint.sh \
+    && echo "exec \"\$@\"" >> /var/lib/redmine/entrypoint.sh \
+    && chmod +x /var/lib/redmine/entrypoint.sh
+
+USER redmine:redmine
+
+WORKDIR /var/lib/redmine
+
+ENTRYPOINT ["/var/lib/redmine/entrypoint.sh"]
+
+EXPOSE 3000
+
+CMD ["rails", "server", "-b", "0.0.0.0"]
